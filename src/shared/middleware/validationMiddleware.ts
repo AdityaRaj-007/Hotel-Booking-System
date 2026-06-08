@@ -31,17 +31,13 @@ export const validate =
 
       next();
     } catch (err) {
+      console.log(err);
       if (err instanceof ZodError) {
         return res.status(400).json({
           success: false,
           data: null,
-          errors: err.issues.map((issue) => ({
-            field: issue.path.join("."),
-            message: issue.message,
-          })),
+          errors: "INVALID_REQUEST",
         });
       }
-
-      next(err);
     }
   };

@@ -1,4 +1,3 @@
-import * as authTypes from "./auth.types";
 import * as authRepository from "./auth.repository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
