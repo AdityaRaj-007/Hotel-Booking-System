@@ -46,5 +46,7 @@ export const AddReviewToBooking = async ({ user, payload }: AddReview) => {
     payload.comment,
   );
 
+  console.log(review);
+
   return review;
 };

@@ -13,7 +13,28 @@ export const createReview = async (
   rating: number,
   comment: string,
 ) => {
-  return await prisma.review.create({
-    data: { userId, hotelId, bookingId, rating, comment },
+  return await prisma.$transaction(async (tx) => {
+    const noOfReviews = await tx.review.findMany({ where: { hotelId } });
+
+    const review = await tx.review.create({
+      data: { userId, hotelId, bookingId, rating, comment },
+    });
+
+    const hotel = await tx.hotel.findUniqueOrThrow({
+      where: { id: hotelId },
+      select: { rating: true },
+    });
+
+    const currentRating = hotel.rating.toNumber();
+
+    const newRating =
+      (currentRating * noOfReviews.length + rating) / (noOfReviews.length + 1);
+
+    await tx.hotel.update({
+      where: { id: hotelId },
+      data: { rating: newRating },
+    });
+
+    return review;
   });
 };
