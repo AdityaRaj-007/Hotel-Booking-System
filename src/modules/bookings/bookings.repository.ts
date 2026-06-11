@@ -9,7 +9,12 @@ export const bookingExists = async (
   const checkIn = new Date(checkInDate).toISOString();
   const checkOut = new Date(checkOutDate).toISOString();
   const booking = await prisma.booking.findMany({
-    where: { roomId, checkInDate: checkIn, checkOutDate: checkOut },
+    where: {
+      roomId,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      status: "CONFIRMED",
+    },
   });
 
   return booking;
