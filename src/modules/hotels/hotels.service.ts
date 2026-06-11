@@ -1,4 +1,4 @@
-import { Hotel } from "../../generated/prisma/client";
+import { Hotel, Room } from "../../generated/prisma/client";
 import * as hotelRepository from "./hotels.repository";
 import {
   AddHotelServiceInput,
@@ -100,4 +100,10 @@ export const getHotelDetails = async (
   };
 
   return response;
+};
+
+export const getRoomDetails = async (roomId: string): Promise<Room | null> => {
+  const room = await hotelRepository.getRoomDetails(roomId);
+
+  return room;
 };

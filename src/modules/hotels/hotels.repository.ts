@@ -130,3 +130,7 @@ export const getHotel = async (hotelId: string) => {
     },
   });
 };
+
+export const getRoomDetails = async (roomId: string) => {
+  return await prisma.room.findUnique({ where: { id: roomId } });
+};

@@ -2,6 +2,7 @@ import * as authRepository from "./auth.repository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Role } from "../../generated/prisma/enums";
+import { User } from "../../generated/prisma/client";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -57,4 +58,8 @@ export const login = async (payload: { email: string; password: string }) => {
   );
 
   return { existingUser, token };
+};
+
+export const findUser = async (email: string): Promise<User | null> => {
+  return await authRepository.findUserByEmail(email);
 };

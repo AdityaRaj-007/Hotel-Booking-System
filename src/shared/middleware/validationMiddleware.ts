@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError, ZodType } from "zod";
+import { success, ZodError, ZodType } from "zod";
 
 type ValidationSchema = {
   body?: unknown;
@@ -22,7 +22,7 @@ export const validate =
       }
 
       if (validatedData.query) {
-        req.query = validatedData.query as Request["query"];
+        Object.assign(req.query, validatedData.query);
       }
 
       if (validatedData.params) {
@@ -39,5 +39,11 @@ export const validate =
           errors: "INVALID_REQUEST",
         });
       }
+
+      return res.status(500).json({
+        success: false,
+        data: null,
+        error: "SERVER_ERROR",
+      });
     }
   };

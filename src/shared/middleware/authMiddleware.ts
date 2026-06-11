@@ -12,8 +12,8 @@ export interface AuthRequest<
   P = {},
   ResBody = any,
   ReqBody = any,
-  ResQuery = any,
-> extends Request<P, ResBody, ReqBody, ResQuery> {
+  ReqQuery = any,
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
   user?: {
     email: string;
     role: Role;
@@ -35,13 +35,13 @@ export const isAuthenticated = (
     });
     return;
   }
-  const token = authHeader?.split("Bearer ")[1];
+  const token = authHeader.split("Bearer ")[1];
 
   if (!token) {
     return res.status(401).json({
       success: false,
       data: {},
-      errors: "Token missing",
+      errors: "UNAUTHORIZED",
     });
   }
   try {
@@ -56,8 +56,8 @@ export const isAuthenticated = (
   } catch (err) {
     return res.status(401).json({
       success: false,
-      data: {},
-      errors: "Invalid or expired token",
+      data: null,
+      errors: "UNAUTHORIZED",
     });
   }
 };
