@@ -1,6 +1,6 @@
 import z from "zod";
 import { BookingStatus, Role } from "../../generated/prisma/enums";
-import { GetBookingSchema } from "./bookings.schema";
+import { CancellingBookingSchema, GetBookingSchema } from "./bookings.schema";
 
 export type AddBookingTypes = {
   user: {
@@ -23,4 +23,15 @@ export type GetBooking = {
   status?: BookingStatus;
 };
 
+export type CancelBooking = {
+  user: {
+    email: string;
+    role: Role;
+  };
+  bookingId: string;
+};
+
 export type GetBookingStatus = z.infer<typeof GetBookingSchema>["query"];
+export type CancelBookingParams = z.infer<
+  typeof CancellingBookingSchema
+>["params"];

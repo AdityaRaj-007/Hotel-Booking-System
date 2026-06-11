@@ -1,4 +1,4 @@
-import { AddBookingTypes, GetBooking } from "./bookings.types";
+import { AddBookingTypes, CancelBooking, GetBooking } from "./bookings.types";
 import * as bookingRepository from "./bookings.repository";
 import * as hotelService from "../hotels/hotels.service";
 import * as authService from "../auth/auth.service";
@@ -92,4 +92,46 @@ export const getBookingDetails = async ({ user, status }: GetBooking) => {
   });
 
   return bookingLists;
+};
+
+export const cancelBooking = async ({ user, bookingId }: CancelBooking) => {
+  const userData = await authService.findUser(user.email);
+
+  if (!userData) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const bookingDetails = await bookingRepository.getBookingDetails(bookingId);
+
+  if (!bookingDetails) {
+    throw new Error("BOOKING_NOT_FOUND");
+  }
+
+  if (userData.id !== bookingDetails.userId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (bookingDetails.status === "CANCELLED") {
+    throw new Error("ALREADY_CANCELLED");
+  }
+  const checkInDate = bookingDetails.checkInDate;
+
+  const daysLeft =
+    (new Date(checkInDate).getTime() - new Date().getTime()) /
+    ((1000 * 60 * 60) / 24);
+
+  console.log(daysLeft);
+
+  if (daysLeft <= 0) {
+    throw new Error("CANCELLATION_DEALINE_PASSED");
+  }
+
+  const response = await bookingRepository.cancelBooking(bookingDetails.id);
+  console.log(response[0]);
+
+  return {
+    id: response[0]?.id,
+    status: response[0]?.status,
+    cancelledAt: response[0]?.cancelledAt,
+  };
 };

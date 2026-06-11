@@ -64,3 +64,14 @@ export const getUserBookings = async (
     },
   });
 };
+
+export const getBookingDetails = async (bookingId: string) => {
+  return await prisma.booking.findUnique({ where: { id: bookingId } });
+};
+
+export const cancelBooking = async (bookingId: string) => {
+  return await prisma.booking.updateManyAndReturn({
+    where: { id: bookingId },
+    data: { status: "CANCELLED", cancelledAt: new Date() },
+  });
+};

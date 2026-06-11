@@ -1,9 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../shared/middleware/authMiddleware";
 import * as bookingService from "./bookings.service";
-import { GetBookingStatus } from "./bookings.types";
-import { success } from "zod";
-import { error } from "node:console";
+import { CancelBookingParams, GetBookingStatus } from "./bookings.types";
 
 export const AddBooking = async (
   req: AuthRequest,
@@ -69,6 +67,42 @@ export const GetBookings = async (
       success: true,
       data: bookingList,
       error: null,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      data: null,
+      error: (err as Error).message,
+    });
+  }
+};
+
+export const CancelBooking = async (
+  req: AuthRequest<CancelBookingParams, {}, {}, {}>,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        data: null,
+        error: "UNAUTHORIZED",
+      });
+    }
+
+    const bookingId = req.params.bookingId;
+    const bookingStatus = await bookingService.cancelBooking({
+      user: req.user,
+      bookingId,
+    });
+
+    console.log(bookingStatus);
+
+    return res.status(200).json({
+      success: true,
+      data: bookingStatus,
+      error: false,
     });
   } catch (err) {
     return res.status(500).json({

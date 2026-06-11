@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { partialRecord } from "zod";
 import { BookingStatus } from "../../generated/prisma/enums";
 
 export const AddBookingSchema = z.object({
@@ -13,5 +13,11 @@ export const AddBookingSchema = z.object({
 export const GetBookingSchema = z.object({
   query: z.object({
     status: z.enum(BookingStatus).optional(),
+  }),
+});
+
+export const CancellingBookingSchema = z.object({
+  params: z.object({
+    bookingId: z.string(),
   }),
 });
