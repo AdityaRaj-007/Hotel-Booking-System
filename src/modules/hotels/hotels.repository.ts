@@ -1,4 +1,3 @@
-import { omit } from "zod/mini";
 import { HotelWhereInput } from "../../generated/prisma/models";
 import { prisma } from "../../infrastructure/db";
 import { HotelFilters } from "./hotels.types";

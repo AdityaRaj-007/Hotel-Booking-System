@@ -135,3 +135,7 @@ export const cancelBooking = async ({ user, bookingId }: CancelBooking) => {
     cancelledAt: response[0]?.cancelledAt,
   };
 };
+
+export const getBookingDetail = async (bookingId: string) => {
+  return await bookingRepository.getBookingDetails(bookingId);
+};
