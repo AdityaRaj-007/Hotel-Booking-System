@@ -2,6 +2,7 @@ import { AddBookingTypes, CancelBooking, GetBooking } from "./bookings.types";
 import * as bookingRepository from "./bookings.repository";
 import * as hotelService from "../hotels/hotels.service";
 import * as authService from "../auth/auth.service";
+import { GlobalError } from "../../shared/utils/GlobalError";
 
 export const addBooking = async ({ user, payload }: AddBookingTypes) => {
   const bookingExists = await bookingRepository.bookingExists(
@@ -13,37 +14,37 @@ export const addBooking = async ({ user, payload }: AddBookingTypes) => {
   console.log("Prev Bookings" + bookingExists);
 
   if (bookingExists.length > 0) {
-    throw new Error("ROOM_NOT_AVAILABLE");
+    throw new GlobalError("ROOM_NOT_AVAILABLE", 400);
   }
 
   const room = await hotelService.getRoomDetails(payload.roomId);
 
   if (!room) {
-    throw new Error("ROOM_NOT_FOUND");
+    throw new GlobalError("ROOM_NOT_FOUND", 404);
   }
 
   if (payload.guests > room.maxOccupancy) {
-    throw new Error("INVALID_CAPACITY");
+    throw new GlobalError("INVALID_CAPACITY", 400);
   }
 
   if (new Date(payload.checkInDate) < new Date()) {
-    throw new Error("INVALID_DATES");
+    throw new GlobalError("INVALID_DATES", 400);
   }
 
   const userData = await authService.findUser(user.email);
 
   if (!userData) {
-    throw new Error("FORBIDDEN");
+    throw new GlobalError("FORBIDDEN", 403);
   }
 
   const hotel = await hotelService.getHotelDetails(room.hotelId);
 
   if (!hotel) {
-    throw new Error("HOTEL_NOT_FOUND");
+    throw new GlobalError("HOTEL_NOT_FOUND", 404);
   }
 
   if (userData.id === hotel.ownerId) {
-    throw new Error("FORBIDDEN");
+    throw new GlobalError("FORBIDDEN", 403);
   }
 
   const nights =
@@ -69,7 +70,7 @@ export const getBookingDetails = async ({ user, status }: GetBooking) => {
   const userData = await authService.findUser(user.email);
 
   if (!userData) {
-    throw new Error("UNAUTHORIZED");
+    throw new GlobalError("UNAUTHORIZED", 401);
   }
 
   const allUserBookings = await bookingRepository.getUserBookings(
@@ -98,21 +99,21 @@ export const cancelBooking = async ({ user, bookingId }: CancelBooking) => {
   const userData = await authService.findUser(user.email);
 
   if (!userData) {
-    throw new Error("UNAUTHORIZED");
+    throw new GlobalError("UNAUTHORIZED", 401);
   }
 
   const bookingDetails = await bookingRepository.getBookingDetails(bookingId);
 
   if (!bookingDetails) {
-    throw new Error("BOOKING_NOT_FOUND");
+    throw new GlobalError("BOOKING_NOT_FOUND", 404);
   }
 
   if (userData.id !== bookingDetails.userId) {
-    throw new Error("FORBIDDEN");
+    throw new GlobalError("FORBIDDEN", 403);
   }
 
   if (bookingDetails.status === "CANCELLED") {
-    throw new Error("ALREADY_CANCELLED");
+    throw new GlobalError("ALREADY_CANCELLED", 400);
   }
   const checkInDate = bookingDetails.checkInDate;
 
@@ -123,7 +124,7 @@ export const cancelBooking = async ({ user, bookingId }: CancelBooking) => {
   console.log(daysLeft);
 
   if (daysLeft <= 0) {
-    throw new Error("CANCELLATION_DEALINE_PASSED");
+    throw new GlobalError("CANCELLATION_DEALINE_PASSED", 400);
   }
 
   const response = await bookingRepository.cancelBooking(bookingDetails.id);

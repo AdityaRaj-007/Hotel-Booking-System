@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { Role } from "../../generated/prisma/enums";
+import { GlobalError } from "../utils/GlobalError";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -28,21 +29,12 @@ export const isAuthenticated = (
   const authHeader = req.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({
-      success: false,
-      data: {},
-      errors: "Unauthorized: No token provided",
-    });
-    return;
+    return next(new GlobalError("UNAUTHORIZED", 401));
   }
   const token = authHeader.split("Bearer ")[1];
 
   if (!token) {
-    return res.status(401).json({
-      success: false,
-      data: {},
-      errors: "UNAUTHORIZED",
-    });
+    return next(new GlobalError("UNAUTHORIZED", 401));
   }
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -54,10 +46,6 @@ export const isAuthenticated = (
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({
-      success: false,
-      data: null,
-      errors: "UNAUTHORIZED",
-    });
+    return next(new GlobalError("UNAUTHORIZED", 401));
   }
 };

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { success, ZodError, ZodType } from "zod";
+import { GlobalError } from "../utils/GlobalError";
 
 type ValidationSchema = {
   body?: unknown;
@@ -33,17 +34,9 @@ export const validate =
     } catch (err) {
       console.log(err);
       if (err instanceof ZodError) {
-        return res.status(400).json({
-          success: false,
-          data: null,
-          errors: "INVALID_REQUEST",
-        });
+        return next(new GlobalError("INVALID_REQUEST", 400));
       }
 
-      return res.status(500).json({
-        success: false,
-        data: null,
-        error: "SERVER_ERROR",
-      });
+      return next(new GlobalError("SERVER_ERROR", 500));
     }
   };

@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../shared/middleware/authMiddleware";
 import * as reviewService from "./reviews.service";
+import { GlobalError } from "../../shared/utils/GlobalError";
 
 export const AddReview = async (
   req: AuthRequest,
@@ -25,10 +26,6 @@ export const AddReview = async (
       error: null,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      data: null,
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };

@@ -25,11 +25,7 @@ export const AddHotel = async (
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      success: false,
-      data: {},
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };
 
@@ -75,11 +71,7 @@ export const AddRoomInHotel = async (
       error: null,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      data: {},
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };
 
@@ -121,10 +113,6 @@ export const GetHotelDetails = async (
 
     return res.status(200).json({ success: true, data: hotel, error: null });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      data: {},
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };

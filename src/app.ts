@@ -5,6 +5,7 @@ import bookingRouter from "./modules/bookings/bookings.routes";
 import reviewRouter from "./modules/reviews/reviews.routes";
 import { isAuthenticated } from "./shared/middleware/authMiddleware";
 import "dotenv/config";
+import { errorMiddleware } from "./shared/middleware/errorMiddleware";
 
 const app = express();
 
@@ -13,5 +14,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/hotels", isAuthenticated, hotelRouter);
 app.use("/api/bookings", isAuthenticated, bookingRouter);
 app.use("/api/reviews", isAuthenticated, reviewRouter);
+
+app.use(errorMiddleware);
 
 export default app;

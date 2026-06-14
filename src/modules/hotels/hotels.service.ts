@@ -1,4 +1,5 @@
 import { Hotel, Room } from "../../generated/prisma/client";
+import { GlobalError } from "../../shared/utils/GlobalError";
 import * as hotelRepository from "./hotels.repository";
 import {
   AddHotelServiceInput,
@@ -13,13 +14,13 @@ export const addHotel = async ({
   payload,
 }: AddHotelServiceInput): Promise<Hotel> => {
   if (user.role !== "OWNER") {
-    throw new Error("FORBIDDEN");
+    throw new GlobalError("FORBIDDEN", 403);
   }
 
   const userData = await hotelRepository.userExists(user.email);
 
   if (!userData) {
-    throw new Error("UNAUTHORIZED");
+    throw new GlobalError("UNAUTHORIZED", 401);
   }
 
   const hotelData = await hotelRepository.createHotel(
@@ -36,13 +37,13 @@ export const addHotel = async ({
 
 export const addRoom = async ({ hotelId, user, payload }: AddRoomInput) => {
   if (user.role !== "OWNER") {
-    throw new Error("FORBIDDEN");
+    throw new GlobalError("FORBIDDEN", 403);
   }
 
   const hotel = await hotelRepository.findHotel(hotelId);
 
   if (!hotel) {
-    throw new Error("HOTEL_NOT_FOUND");
+    throw new GlobalError("HOTEL_NOT_FOUND", 404);
   }
 
   const { roomNumber, roomType, pricePerNight, maxOccupancy } = payload;
@@ -50,7 +51,7 @@ export const addRoom = async ({ hotelId, user, payload }: AddRoomInput) => {
   const roomExists = await hotelRepository.findRoom(hotelId, roomNumber);
 
   if (roomExists) {
-    throw new Error("ROOM_ALREADY_EXISTS");
+    throw new GlobalError("ROOM_ALREADY_EXISTS", 400);
   }
 
   const roomData = await hotelRepository.addRoom(

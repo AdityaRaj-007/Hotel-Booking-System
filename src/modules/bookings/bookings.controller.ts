@@ -26,11 +26,7 @@ export const AddBooking = async (
       .json({ success: true, data: bookingData, error: null });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
-      success: false,
-      data: null,
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };
 
@@ -69,11 +65,7 @@ export const GetBookings = async (
       error: null,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      data: null,
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };
 
@@ -105,10 +97,6 @@ export const CancelBooking = async (
       error: false,
     });
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      data: null,
-      error: (err as Error).message,
-    });
+    return next(err);
   }
 };
